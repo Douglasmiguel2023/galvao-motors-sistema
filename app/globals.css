@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  background: #f9fbff;
+  color: #091f5c;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+.card-halo {
+  box-shadow: 0 0 0 1px rgba(112, 150, 209, 0.35), 0 10px 30px rgba(9, 31, 92, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.card-halo:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 0 1px rgba(61, 148, 221, 0.6), 0 0 28px rgba(61, 148, 221, 0.45),
+    0 16px 36px rgba(9, 31, 92, 0.16);
+}
+@keyframes car-cross {
+  from { left: -30%; }
+  to { left: 105%; }
+}
+@keyframes wheel-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes loadbar {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+@keyframes fade-out {
+  to { opacity: 0; visibility: hidden; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

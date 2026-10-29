@@ -1,0 +1,27 @@
+// Galvão Motors — vehicle inventory.
+// Local dev: SQLite. Production (Vercel + Neon): PostgreSQL via DATABASE_URL.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Vehicle {
+  id           String   @id @default(cuid())
+  model        String
+  year         Int
+  color        String
+  km           Int
+  fuel         String
+  transmission String
+  category     String // SUV | sedã | hatch | picape
+  price        Int // in cents (BRL)
+  photoUrl     String
+  description  String   @default("")
+  status       String   @default("active") // active | sold
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
