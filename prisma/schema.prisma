@@ -1,11 +1,11 @@
 // Galvão Motors — vehicle inventory.
-// Local dev: SQLite. Production (Vercel + Neon): PostgreSQL via DATABASE_URL.
+// Production: PostgreSQL (Prisma Postgres on Vercel) via DATABASE_URL.
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

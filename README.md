@@ -58,13 +58,14 @@ Quando for trocar, os passos são os do dono, nas contas dele:
    Não suba por cima do repositório `galvao-motors` atual antes de a nova versão estar testada.
 2. **Vercel:** importar o repositório novo em vercel.com/new com o preset **Next.js**
    (não “Other” — este projeto é Next.js, diferente do site estático atual).
-3. **Neon (banco PostgreSQL):** criar um banco em neon.tech e copiar a connection string.
+3. **Banco PostgreSQL:** usar a integração **Prisma Postgres** da Vercel
+   (Storage → Create Database → Prisma Postgres → Connect no projeto).
+   Ela preenche a `DATABASE_URL` sozinha no projeto.
 4. **Variáveis de ambiente na Vercel** (Production), todas sem aspas extras:
-   - `DATABASE_URL` = connection string do Neon (PostgreSQL).
-     Atenção: o `schema.prisma` está com `provider = "sqlite"` para o dev local.
-     Antes do primeiro deploy em produção, trocar para `provider = "postgresql"`
-     em `prisma/schema.prisma`, rodar `npx prisma migrate deploy` (ou `prisma db push`
-     na primeira vez) com a `DATABASE_URL` do Neon e fazer o deploy.
+   - `DATABASE_URL` = connection string do Prisma Postgres (preenchida
+     automaticamente ao conectar o banco). O `schema.prisma` já está com
+     `provider = "postgresql"` e o build (`prisma generate && prisma migrate
+     deploy && next build`) cria as tabelas no deploy.
    - `ADMIN_EMAIL` = e-mail do administrador.
    - `ADMIN_PASSWORD_HASH` = hash bcrypt gerado com `npm run hash-password`.
    - `AUTH_SECRET` = uma string longa e aleatória qualquer.
@@ -86,5 +87,5 @@ Quando for trocar, os passos são os do dono, nas contas dele:
 
 ## Stack
 
-Next.js 15 + TypeScript + Tailwind CSS + Prisma. SQLite no dev local,
-PostgreSQL (Neon) em produção. Fotos: Vercel Blob (produção) / `public/uploads/` (dev).
+Next.js 15 + TypeScript + Tailwind CSS + Prisma. PostgreSQL
+(Prisma Postgres) em produção. Fotos: Vercel Blob (produção) / `public/uploads/` (dev).
