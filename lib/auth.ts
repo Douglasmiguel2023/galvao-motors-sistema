@@ -20,7 +20,13 @@ export function verifySessionToken(token: string): string | null {
   const expected = sign(payload);
   if (sig.length !== expected.length) return null;
   if (!timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
-  const [email] = payload.split(".");
+  // Payload is `${email}.${timestamp}`. E-mails contain dots (ex.: .com),
+  // so the timestamp must be split at the LAST dot, not the first one:
+  // splitting at the first dot truncated the e-mail and the session was
+  // never recognised after a successful login.
+  const lastDot = payload.lastIndexOf(".");
+  if (lastDot <= 0) return null;
+  const email = payload.slice(0, lastDot);
   return email || null;
 }
 
