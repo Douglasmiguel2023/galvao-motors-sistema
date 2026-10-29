@@ -18,11 +18,25 @@ async function requireAdmin() {
 export async function login(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
+  // Password check, in order: bcrypt hash (ADMIN_PASSWORD_HASH) or plain
+  // env password (ADMIN_PASSWORD). The plain option exists because hash
+  // generation kept failing for the owner; it is still server-side only
+  // (Vercel env vars, never in code) and must be a unique password.
+  let passwordOk = false;
+  if (process.env.ADMIN_PASSWORD_HASH) {
+    try {
+      passwordOk = await compare(password, process.env.ADMIN_PASSWORD_HASH);
+    } catch {
+      passwordOk = false;
+    }
+  }
+  if (!passwordOk && process.env.ADMIN_PASSWORD) {
+    passwordOk = password.length > 0 && password === process.env.ADMIN_PASSWORD;
+  }
   const ok =
     process.env.ADMIN_EMAIL &&
     email === process.env.ADMIN_EMAIL &&
-    process.env.ADMIN_PASSWORD_HASH &&
-    (await compare(password, process.env.ADMIN_PASSWORD_HASH));
+    passwordOk;
   if (!ok) redirect("/admin?error=E-mail%20ou%20senha%20incorretos.");
   (await cookies()).set(SESSION_COOKIE, createSessionToken(email), {
     httpOnly: true,

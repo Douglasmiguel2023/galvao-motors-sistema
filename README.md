@@ -67,7 +67,9 @@ Quando for trocar, os passos são os do dono, nas contas dele:
      `provider = "postgresql"` e o build (`prisma generate && prisma migrate
      deploy && next build`) cria as tabelas no deploy.
    - `ADMIN_EMAIL` = e-mail do administrador.
-   - `ADMIN_PASSWORD_HASH` = hash bcrypt gerado com `npm run hash-password`.
+   - `ADMIN_PASSWORD_HASH` = hash bcrypt gerado com `npm run hash-password`,
+    **ou** `ADMIN_PASSWORD` = senha direta (opção mais simples; use uma senha
+    única, usada em nenhum outro lugar, e nunca a cole no chat).
    - `AUTH_SECRET` = uma string longa e aleatória qualquer.
    - `BLOB_READ_WRITE_TOKEN` = token da Vercel Blob (Storage → Blob → Create Store →
      copiar o token). **Sem ele, o upload de fotos não funciona em produção**
