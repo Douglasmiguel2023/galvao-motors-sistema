@@ -70,7 +70,16 @@ function fields(formData: FormData) {
 export async function createVehicle(formData: FormData) {
   await requireAdmin();
   const photo = formData.get("photo") as File | null;
-  const photoUrl = photo && photo.size > 0 ? await saveUpload(photo) : "/placeholders/suv.svg";
+  let photoUrl = "/placeholders/suv.svg";
+  if (photo && photo.size > 0) {
+    try {
+      photoUrl = await saveUpload(photo);
+    } catch {
+      // Vercel Blob token inválido/ausente: em vez de "Application error"
+      // genérico, volta ao painel com a causa legível.
+      redirect("/admin?error=Falha%20no%20upload%20da%20foto%3A%20o%20token%20do%20Vercel%20Blob%20(BLOB_READ_WRITE_TOKEN)%20est%C3%A1%20inv%C3%A1lido.%20Conecte%20a%20loja%20Blob%20ao%20projeto%20na%20Vercel%20e%20fa%C3%A7a%20redeploy.");
+    }
+  }
   const data = fields(formData);
   await prisma.vehicle.create({ data: { ...data, photoUrl } });
   revalidatePath("/");

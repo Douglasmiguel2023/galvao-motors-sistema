@@ -89,6 +89,7 @@ export default async function AdminPage({ searchParams }: { searchParams?: Promi
           </div>
         </div>
 
+        {sp.error && <p className="mt-6 rounded-xl bg-red-100 px-4 py-3 text-sm font-semibold text-red-700">{sp.error}</p>}
         <h2 className="mt-8 text-lg font-bold">Adicionar veículo</h2>
         <div className="mt-3"><VehicleForm /></div>
 
