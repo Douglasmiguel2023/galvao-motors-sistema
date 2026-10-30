@@ -14,6 +14,7 @@ export type VehicleDTO = {
   category: string;
   price: number;
   photoUrl: string;
+  photos?: string[];
   description: string;
   status: string;
 };
@@ -31,6 +32,19 @@ export default function VehicleGrid({ vehicles }: { vehicles: VehicleDTO[] }) {
   const [category, setCategory] = useState("Todas");
   const [sort, setSort] = useState("featured");
   const [selected, setSelected] = useState<VehicleDTO | null>(null);
+  const [activePhoto, setActivePhoto] = useState(0);
+
+  const openVehicle = (v: VehicleDTO) => {
+    setSelected(v);
+    setActivePhoto(0);
+  };
+
+  const selectedPhotos =
+    selected && selected.photos && selected.photos.length > 0
+      ? selected.photos
+      : selected
+        ? [selected.photoUrl]
+        : [];
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -95,7 +109,7 @@ export default function VehicleGrid({ vehicles }: { vehicles: VehicleDTO[] }) {
           {filtered.map((v) => (
             <article key={v.id} className="card-halo overflow-hidden rounded-2xl bg-white">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={v.photoUrl} alt={v.model} className="h-52 w-full object-cover" loading="lazy" />
+              <img src={v.photos?.[0] ?? v.photoUrl} alt={v.model} className="h-52 w-full object-cover" loading="lazy" />
               <div className="p-5">
                 <p className="text-xs font-bold uppercase tracking-wide text-royal">
                   {v.category} · {v.color}
@@ -108,7 +122,7 @@ export default function VehicleGrid({ vehicles }: { vehicles: VehicleDTO[] }) {
                 <p className="text-xl font-extrabold text-navy">{brl(v.price)}</p>
                 <div className="mt-4 flex gap-2">
                   <button
-                    onClick={() => setSelected(v)}
+                    onClick={() => openVehicle(v)}
                     className="flex-1 rounded-full border border-ice px-4 py-2 text-sm font-semibold text-royal transition hover:bg-pale"
                   >
                     Detalhes
@@ -132,7 +146,21 @@ export default function VehicleGrid({ vehicles }: { vehicles: VehicleDTO[] }) {
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-navy/60 p-0 sm:items-center sm:p-6" onClick={() => setSelected(null)} role="dialog" aria-modal="true" aria-label={`Detalhes de ${selected.model}`}>
           <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-t-3xl bg-white p-6 sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={selected.photoUrl} alt={selected.model} className="h-64 w-full rounded-2xl object-cover" />
+            <img src={selectedPhotos[activePhoto] ?? selected.photoUrl} alt={selected.model} className="h-64 w-full rounded-2xl object-cover" />
+            {selectedPhotos.length > 1 && (
+              <div className="mt-3 flex gap-2 overflow-x-auto">
+                {selectedPhotos.map((src, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <button key={i} onClick={() => setActivePhoto(i)} aria-label={`Ver foto ${i + 1}`}>
+                    <img
+                      src={src}
+                      alt=""
+                      className={`h-16 w-24 rounded-lg object-cover ${i === activePhoto ? "ring-2 ring-royal" : "opacity-70"}`}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
             <div className="mt-5 flex items-start justify-between gap-3">
               <h3 className="text-2xl font-extrabold text-navy">{selected.model}</h3>
               <button onClick={() => setSelected(null)} className="rounded-full bg-pale px-4 py-2 text-sm font-semibold text-royal" aria-label="Fechar detalhes">Fechar ✕</button>

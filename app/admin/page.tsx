@@ -37,9 +37,13 @@ function VehicleForm({ v }: { v?: any }) {
       <label className="text-sm font-semibold">Preço (R$)
         <input name="price" defaultValue={v ? (v.price / 100).toLocaleString("pt-BR") : ""} required className="mt-1 w-full rounded-lg border border-ice px-3 py-2 font-normal" placeholder="Ex.: 89900 ou 89.900" />
       </label>
-      <label className="text-sm font-semibold sm:col-span-2">Foto {v ? "(deixe em branco para manter a atual)" : ""}
-        <input name="photo" type="file" accept="image/*" {...(v ? {} : { required: true })} className="mt-1 w-full rounded-lg border border-ice px-3 py-2 font-normal" />
+      <label className="text-sm font-semibold sm:col-span-2">Fotos — selecione várias {v ? "(deixe em branco para manter as atuais; se selecionar, substitui todas)" : ""}
+        <input name="photos" type="file" accept="image/*" multiple {...(v ? {} : { required: true })} className="mt-1 w-full rounded-lg border border-ice px-3 py-2 font-normal" />
       </label>
+      {v && (v.photos?.length ? v.photos : [v.photoUrl]).map((src: string, i: number) => (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img key={i} src={src} alt="" className="h-16 w-24 rounded-lg object-cover" />
+      ))}
       <label className="text-sm font-semibold sm:col-span-2">Descrição (opcional)
         <textarea name="description" defaultValue={v?.description ?? ""} rows={2} className="mt-1 w-full rounded-lg border border-ice px-3 py-2 font-normal" />
       </label>
@@ -105,7 +109,7 @@ export default async function AdminPage({ searchParams }: { searchParams?: Promi
           {vehicles.map((v) => (
             <div key={v.id} className="flex flex-wrap items-center gap-4 rounded-2xl bg-white p-4 shadow-sm">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={v.photoUrl} alt={v.model} className="h-16 w-24 rounded-lg object-cover" />
+              <img src={v.photos?.[0] ?? v.photoUrl} alt={v.model} className="h-16 w-24 rounded-lg object-cover" />
               <div className="min-w-[200px] flex-1">
                 <p className="font-bold">{v.model} <span className={v.status === "sold" ? "text-red-600" : "text-green-700"}>· {v.status === "sold" ? "VENDIDO (fora do site)" : "À venda"}</span></p>
                 <p className="text-sm text-royal/80">{v.year} · {v.category} · {v.km.toLocaleString("pt-BR")} km · {brl(v.price)}</p>

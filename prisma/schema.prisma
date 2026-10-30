@@ -20,6 +20,7 @@ model Vehicle {
   category     String // SUV | sedã | hatch | picape
   price        Int // in cents (BRL)
   photoUrl     String
+  photos       String[] @default([])
   description  String   @default("")
   status       String   @default("active") // active | sold
   createdAt    DateTime @default(now())

@@ -67,21 +67,32 @@ function fields(formData: FormData) {
   };
 }
 
+async function uploadedPhotos(formData: FormData): Promise<string[]> {
+  const files = (formData.getAll("photos") as File[]).filter(
+    (f) => f && typeof f === "object" && "size" in f && f.size > 0
+  );
+  const legacy = formData.get("photo") as File | null;
+  if (files.length === 0 && legacy && legacy.size > 0) files.push(legacy);
+  const urls: string[] = [];
+  for (const file of files.slice(0, 8)) {
+    urls.push(await saveUpload(file));
+  }
+  return urls;
+}
+
 export async function createVehicle(formData: FormData) {
   await requireAdmin();
-  const photo = formData.get("photo") as File | null;
-  let photoUrl = "/placeholders/suv.svg";
-  if (photo && photo.size > 0) {
-    try {
-      photoUrl = await saveUpload(photo);
-    } catch {
-      // Vercel Blob token inválido/ausente: em vez de "Application error"
-      // genérico, volta ao painel com a causa legível.
-      redirect("/admin?error=Falha%20no%20upload%20da%20foto%3A%20o%20token%20do%20Vercel%20Blob%20(BLOB_READ_WRITE_TOKEN)%20est%C3%A1%20inv%C3%A1lido.%20Conecte%20a%20loja%20Blob%20ao%20projeto%20na%20Vercel%20e%20fa%C3%A7a%20redeploy.");
-    }
+  let photos: string[] = [];
+  try {
+    photos = await uploadedPhotos(formData);
+  } catch {
+    // Upload falhou (ex.: token do Blob inválido): em vez de
+    // "Application error" genérico, volta ao painel com a causa legível.
+    redirect("/admin?error=Falha%20no%20upload%20das%20fotos.%20Tente%20novamente%20com%20fotos%20menores.");
   }
+  const photoUrl = photos[0] ?? "/placeholders/suv.svg";
   const data = fields(formData);
-  await prisma.vehicle.create({ data: { ...data, photoUrl } });
+  await prisma.vehicle.create({ data: { ...data, photoUrl, photos } });
   revalidatePath("/");
   revalidatePath("/admin");
   redirect("/admin");
@@ -90,10 +101,12 @@ export async function createVehicle(formData: FormData) {
 export async function updateVehicle(formData: FormData) {
   await requireAdmin();
   const id = String(formData.get("id"));
-  const photo = formData.get("photo") as File | null;
   const data = fields(formData);
-  const photoUrl = photo && photo.size > 0 ? await saveUpload(photo) : undefined;
-  await prisma.vehicle.update({ where: { id }, data: { ...data, ...(photoUrl ? { photoUrl } : {}) } });
+  const photos = await uploadedPhotos(formData);
+  await prisma.vehicle.update({
+    where: { id },
+    data: { ...data, ...(photos.length > 0 ? { photoUrl: photos[0], photos } : {}) },
+  });
   revalidatePath("/");
   revalidatePath("/admin");
   redirect("/admin");
