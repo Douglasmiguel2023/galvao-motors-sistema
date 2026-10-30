@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { LOGO_DATA_URI } from "@/lib/site-assets";
 
-/** Intro fold: clean dark-blue background, large wordmark. On scroll the
- *  logo zooms up to ~2.6x and dissolves, then the normal site continues.
- *  Under prefers-reduced-motion the fold is static and short. */
+/** Intro fold, like the static site: clean dark-blue background, large
+ *  eagle logo. On scroll the logo zooms up to ~2.6x and dissolves, then
+ *  the normal site continues. Under prefers-reduced-motion the fold is
+ *  static and short. */
 export default function IntroZoom() {
   const ref = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
@@ -28,16 +30,15 @@ export default function IntroZoom() {
   const opacity = 1 - progress;
 
   return (
-    <section ref={ref} className="relative h-[230vh] bg-navy">
+    <section ref={ref} className="relative h-[230vh] bg-navy" aria-label="Galvão Motors — abertura">
       <div className="sticky top-0 flex h-[100svh] flex-col items-center justify-center overflow-hidden bg-navy text-white">
         <div style={{ transform: `scale(${scale})`, opacity, transformOrigin: "center" }} className="text-center">
-          <p className="text-5xl font-extrabold tracking-wide sm:text-7xl">
-            GALVÃO <span className="text-lightblue">MOTORS</span>
-          </p>
-          <p className="mt-4 text-base text-ice sm:text-lg">Seminovos selecionados</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={LOGO_DATA_URI} alt="Galvão Motors" className="mx-auto h-64 w-64 object-contain sm:h-80 sm:w-80" />
+          <p className="mt-4 text-base tracking-[0.3em] text-ice sm:text-lg">SEMINOVOS SELECIONADOS</p>
         </div>
-        <p className="absolute bottom-8 text-sm text-ice" style={{ opacity: progress < 0.2 ? 1 : 0 }}>
-          Role para entrar ↓
+        <p className="absolute bottom-8 text-sm tracking-widest text-ice" style={{ opacity: progress < 0.2 ? 1 : 0 }}>
+          ROLE PARA ENTRAR ↓
         </p>
       </div>
     </section>
