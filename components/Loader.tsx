@@ -57,7 +57,20 @@ export default function Loader() {
       <p className="mt-6 text-sm font-light tracking-[0.45em] text-white/90">GALVÃO&nbsp;MOTORS</p>
       <div className="mt-4 h-px w-10 bg-white/40" aria-hidden />
       <p className="mt-4 text-[10px] tracking-[0.35em] text-ice/80">SEMINOVOS&nbsp;SELECIONADOS</p>
-      <div className="mt-10 h-px w-full max-w-xs overflow-hidden bg-white/15">
+      {/* Elegant, fun car gliding along the progress line, like before —
+          but as a minimalist white line-drawing instead of an emoji. */}
+      <div className="relative mt-10 h-12 w-full max-w-xs overflow-hidden" aria-hidden>
+        <div className="absolute bottom-1 left-0 right-0 h-px bg-white/15" />
+        <div className="absolute bottom-2" style={{ animation: "car-cross 2.4s linear infinite" }}>
+          <svg width="64" height="26" viewBox="0 0 120 44" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.95">
+            <path d="M10 30 L18 21 Q26 13 40 13 L54 13 Q62 13 68 19 L86 19 Q96 19 102 25 L111 30" />
+            <path d="M10 30 L111 30" />
+            <circle cx="36" cy="32" r="6" />
+            <circle cx="88" cy="32" r="6" />
+          </svg>
+        </div>
+      </div>
+      <div className="mt-2 h-px w-full max-w-xs overflow-hidden bg-white/15">
         <div className="h-full bg-white/90 transition-all duration-200" style={{ width: `${pct}%` }} />
       </div>
       <p className="mt-4 text-[10px] tracking-[0.3em] text-ice/70">{pct}%</p>
