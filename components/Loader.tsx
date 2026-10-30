@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { LOGO_DATA_URI } from "@/lib/site-assets";
 
-/** Loading overlay, like the static site: navy #091F5C, eagle logo,
- *  a car crossing the progress line, "PREPARANDO O ESTOQUE" + %.
- *  Fades out on window load, with a hard 5s fallback so it can never
- *  trap the user. Skipped entirely under prefers-reduced-motion. */
+/** Minimalist, modern loading screen: navy #091F5C, small eagle logo,
+ *  generous whitespace, a single hairline progress line and tiny
+ *  letterspaced text. No emoji, no chunky elements. Fades out on window
+ *  load, with a hard 5s fallback so it can never trap the user.
+ *  Skipped entirely under prefers-reduced-motion. */
 export default function Loader() {
   const [visible, setVisible] = useState(true);
+  const [fading, setFading] = useState(false);
   const [pct, setPct] = useState(0);
 
   useEffect(() => {
@@ -17,9 +19,12 @@ export default function Loader() {
       return;
     }
     const tick = setInterval(() => {
-      setPct((p) => (p >= 100 ? 100 : p + Math.floor(Math.random() * 12) + 4));
+      setPct((p) => (p >= 100 ? 100 : p + Math.floor(Math.random() * 10) + 3));
     }, 220);
-    const hide = () => setVisible(false);
+    const hide = () => {
+      setFading(true);
+      setTimeout(() => setVisible(false), 500);
+    };
     window.addEventListener("load", hide);
     const fallback = setTimeout(hide, 5000);
     return () => {
@@ -31,7 +36,10 @@ export default function Loader() {
 
   useEffect(() => {
     if (pct >= 100) {
-      const t = setTimeout(() => setVisible(false), 400);
+      const t = setTimeout(() => {
+        setFading(true);
+        setTimeout(() => setVisible(false), 500);
+      }, 350);
       return () => clearTimeout(t);
     }
   }, [pct]);
@@ -39,25 +47,20 @@ export default function Loader() {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-navy px-4 text-white" role="status" aria-label="Carregando o site da Galvão Motors">
+    <div
+      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-navy px-4 text-white transition-opacity duration-500 ${fading ? "opacity-0" : "opacity-100"}`}
+      role="status"
+      aria-label="Carregando o site da Galvão Motors"
+    >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={LOGO_DATA_URI} alt="Galvão Motors" className="h-40 w-40 object-contain sm:h-52 sm:w-52" />
-      <p className="mt-2 text-lg font-extrabold tracking-[0.3em]">GALVÃO MOTORS</p>
-      <p className="mt-1 text-xs tracking-[0.25em] text-ice">SEMINOVOS SELECIONADOS</p>
-      <div className="relative mt-10 h-16 w-full max-w-md overflow-hidden">
-        <div className="absolute bottom-2 left-0 right-0 h-[3px] bg-white/20" />
-        <div
-          className="absolute bottom-6 text-5xl"
-          style={{ animation: "car-cross 2.2s linear infinite" }}
-          aria-hidden
-        >
-          🚗
-        </div>
+      <img src={LOGO_DATA_URI} alt="Galvão Motors" className="h-24 w-24 object-contain opacity-90 sm:h-28 sm:w-28" />
+      <p className="mt-6 text-sm font-light tracking-[0.45em] text-white/90">GALVÃO&nbsp;MOTORS</p>
+      <div className="mt-4 h-px w-10 bg-white/40" aria-hidden />
+      <p className="mt-4 text-[10px] tracking-[0.35em] text-ice/80">SEMINOVOS&nbsp;SELECIONADOS</p>
+      <div className="mt-10 h-px w-full max-w-xs overflow-hidden bg-white/15">
+        <div className="h-full bg-white/90 transition-all duration-200" style={{ width: `${pct}%` }} />
       </div>
-      <div className="mt-4 h-2 w-full max-w-md overflow-hidden rounded-full bg-white/20">
-        <div className="h-full rounded-full bg-lightblue transition-all duration-200" style={{ width: `${pct}%` }} />
-      </div>
-      <p className="mt-3 text-xs tracking-widest text-ice">PREPARANDO O ESTOQUE · {pct}%</p>
+      <p className="mt-4 text-[10px] tracking-[0.3em] text-ice/70">{pct}%</p>
       <noscript>
         <style>{`div[role="status"]{display:none}`}</style>
       </noscript>
